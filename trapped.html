@@ -1,0 +1,196 @@
+<html>
+    <head>
+        <!-- put in jquery library first! -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        
+        <style>
+            
+            body{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 0;
+            }
+        
+            #mycanvas{
+                background-color: rgba(255, 248, 220, 0.49);
+            }
+        </style>
+        
+    
+        
+        <!-- put in our javascript code-->
+        <script>
+        
+            //global vars
+            let cn;
+            let ctx;
+            
+            //hold all of my points
+            let points = [];
+            //hold all the blocks
+            let blocks = [];
+            
+            $(document).ready(function(){
+               //all our code goes in here 
+                cn = document.getElementById('mycanvas');
+                
+                //init something called the context
+                ctx = cn.getContext('2d');
+                
+                //set the canvas width and height
+                cn.width = window.innerWidth;
+                cn.height = window.innerHeight;
+                
+                //call first function
+                setInterval( animate, 33);
+                
+                for(let i = 0; i < 50; i++){
+                    points[i] = new Particle();
+                
+                };
+                
+                for(let i = 0; i < 1; i++){
+                    blocks[i] = new Block();
+                
+                };
+                
+            });
+        
+            
+            
+            
+            //all animation frames get drawn here
+            function animate(){
+                //clear screen
+                ctx.clearRect(0,0,cn.width, cn.height);
+                
+                for(let i = 0; i < points.length; i++){
+                    points[i].drawMe();
+                    points[i].moveMe();
+                }
+                
+                 for(let i = 0; i < blocks.length; i++){
+                    blocks[i].drawBlock();
+                    blocks[i].moveBlock();
+                }
+                     
+            }
+            
+            function Particle(){
+                
+                this.x = getRandom(0, cn.width);
+                this.y = getRandom(0, cn.height);
+                this.radius = 15;
+                this.xspeed = getRandom(-5, 5);
+                this.yspeed = getRandom(-5,5);
+                
+                this.drawMe = function(){
+                    ctx.fillStyle = '#afcaff';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+                    ctx.fill();
+                    
+
+                };
+               
+                
+                this.moveMe = function(){
+                    //check against rectangle edge
+                    //i am to the left of the block
+                    if( blocks[0].x > this.x){
+                        
+                        //if the potential of being past the edge
+                        if( this.x + this.xspeed >= blocks[0].x){
+                            this.xspeed *= -1;
+                            this.x += this.xspeed;
+                        }
+                    } else if (blocks[0].x + blocks[0].w < this.x) {
+                        //then i am on the right side
+                        if(this.x - 10 <= blocks[0].x + blocks[0].w) {
+                            this.xspeed *= -1;
+                            this.x += this.xspeed;
+                        }
+                    }
+                    
+                    
+                    
+                    this.x += this.xspeed;
+                    this.y += this.yspeed;
+                    
+                    //left side and right
+                    if(this.x <= 0 || this.x >= cn.width){
+                        this.xspeed *= -1;
+                    }
+                    
+                     //top side and bottom
+                    if(this.y <= 0 || this.y >= cn.height){
+                        this.yspeed *= -1;
+                    }
+                    
+                    
+                    
+                };
+                
+             }
+                
+            function Block(){
+                this.x = getRandom(0, cn.width);
+                let xspeed = getRandom(-1,-.1);
+                this.w = 10;
+                
+                 this.drawBlock = function(){
+                    ctx.fillStyle = 'black';
+                     ctx.fillRect( this.x, 0, this.w, cn.height );
+                }
+
+                
+                this.moveBlock = function(){
+                    //move left
+                    this.x += xspeed;
+                    
+                    //move right is to grow width
+                    this.w += -(xspeed * 2);
+                    //this.y += this.yspeed;
+                 
+                    
+                    //out side and edge
+                    if(this.x <= 20 || this.x + this.w >= cn.width-40){
+                        xspeed *= -1;
+                    }
+                    
+                    if( this.w <= 10){
+                        xspeed *= -1;
+                    }
+                };
+            }
+            
+             
+        
+            //always keep
+            function degToRad (deg) {
+                var radians = (deg * Math.PI / 180);
+                return radians;
+            }
+            
+            function getRandom(min, max){
+                return Math.random() * (max - min) + min;
+            }
+            
+            function getRandomInt(min,max){
+                return Math.floor(Math.random()* (max-min+1)) + min;
+            }
+        
+        </script>
+
+    
+    </head>
+    
+    <body>
+    
+        <canvas id="mycanvas"></canvas>
+    
+    </body>
+
+
+</html>
